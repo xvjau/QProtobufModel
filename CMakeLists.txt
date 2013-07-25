@@ -8,7 +8,7 @@ find_package(Qt5 REQUIRED Gui Widgets Qml Quick)
 find_package(Protobuf REQUIRED)
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -Wall -Wextra)
 
 include_directories(${Qt5Gui_INCLUDE_DIRS} ${Qt5Widgets_INCLUDE_DIRS} ${Qt5Qml_INCLUDE_DIRS} ${Qt5Quick_INCLUDE_DIRS} ${PROTOBUF_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
