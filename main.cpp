@@ -7,7 +7,15 @@
 #include <test.pb.h>
 #include <fstream>
 
+#include "qprotobufmodel.h"
+
 #include <iostream>
+
+std::ostream& operator<<(std::ostream& str, const QString& _string)
+{
+    str << _string.toLatin1().data();
+    return str;
+}
 
 int main(int argc, char** argv)
 {
@@ -62,15 +70,31 @@ int main(int argc, char** argv)
         QQmlEngine engine;
         QObject::connect(&engine, SIGNAL(quit()), QCoreApplication::instance(), SLOT(quit()));
 
+        qmlRegisterType<QProtobufModel>("br.com.bitforge", 1, 0, "ProtobufModel");
+
         QQmlComponent *component = new QQmlComponent(&engine);
         component->loadUrl(mainWindowUrl);
 
         QObject *topLevel = component->create();
-        QQuickWindow *window = qobject_cast<QQuickWindow *>(topLevel);
+        if (component->isError())
+        {
+            std::cerr << "QML loading error:\n";
+            for(auto error : component->errors())
+            {
+                std::cerr << error.url().toString() << ':' << error.line() << ':' << error.column() << " - " << error.description() << "\n";
+            }
+            std::cerr << std::endl;
 
-        window->show();
+            return 2;
+        }
+        else
+        {
+            QQuickWindow *window = qobject_cast<QQuickWindow *>(topLevel);
 
-        return app.exec();
+            window->show();
+
+            return app.exec();
+        }
     }
     catch(const std::exception &e)
     {

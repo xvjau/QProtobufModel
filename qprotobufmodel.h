@@ -34,15 +34,25 @@ class QProtobufModel : public QAbstractItemModel
                 NOTIFY metadataChanged
     )
 
-    Q_PROPERTY(QUrl srouce
+    Q_PROPERTY(QString message
+                READ message
+                WRITE setMessage
+                NOTIFY messageChanged
+    )
+
+    Q_PROPERTY(QUrl source
                 READ source
                 WRITE setSource
                 NOTIFY sourceChanged
     )
 
 public:
-    QProtobufModel(QObject *_parent);
+    QProtobufModel(QObject *_parent = nullptr);
     virtual ~QProtobufModel();
+
+    virtual QModelIndex index(int row, int column,
+                              const QModelIndex &parent = QModelIndex()) const override;
+    virtual QModelIndex parent(const QModelIndex &child) const override;
 
     virtual int rowCount(const QModelIndex& = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& = QModelIndex()) const override;
@@ -63,15 +73,20 @@ public:
     const QUrl& metadata() const { return m_metadata; }
     void setMetadata(const QUrl& _url);
 
+    const QString& message() const { return m_message; }
+    void setMessage(const QString &_message);
+
     const QUrl& source() const { return m_source; }
     void setSource(const QUrl& _url);
 
 signals:
     void metadataChanged(const QUrl& _url);
+    void messageChanged(const QString& _url);
     void sourceChanged(const QUrl& _url);
 
 private:
     QUrl m_metadata;
+    QString m_message;
     QUrl m_source;
 };
 

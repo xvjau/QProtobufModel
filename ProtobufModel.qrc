@@ -2,4 +2,7 @@
     <qresource prefix="/qml">
         <file>Test.qml</file>
     </qresource>
+    <qresource prefix="/pb">
+        <file>test.proto</file>
+    </qresource>
 </RCC>

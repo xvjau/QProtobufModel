@@ -33,6 +33,16 @@ QProtobufModel::~QProtobufModel()
 
 }
 
+QModelIndex QProtobufModel::index(int row, int column, const QModelIndex &parent) const
+{
+
+}
+
+QModelIndex QProtobufModel::parent(const QModelIndex &child) const
+{
+
+}
+
 int QProtobufModel::rowCount(const QModelIndex &) const
 {
 
@@ -86,6 +96,12 @@ void QProtobufModel::setMetadata(const QUrl &_url)
 {
     m_metadata = _url;
     emit metadataChanged(m_metadata);
+}
+
+void QProtobufModel::setMessage(const QString &_message)
+{
+    m_message = _message;
+    emit messageChanged(m_message);
 }
 
 void QProtobufModel::setSource(const QUrl &_url)
