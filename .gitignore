@@ -1,0 +1,4 @@
+# For KDevelop/CMake
+*.kdev4
+build*
+

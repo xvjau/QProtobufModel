@@ -1,0 +1,29 @@
+package pb;
+
+message Date
+{
+    optional int32 year = 1;
+    optional int32 month = 2;
+    optional int32 day = 3;
+}
+
+message Time
+{
+    optional int32 hour = 1;
+    optional int32 minutes = 2;
+    optional int32 seconds = 3;
+    optional int32 milliSeconds = 4;
+
+    optional string utcOffset = 5; // i.e. time-zone in ISO-8601, e.g.: '+0300', or '+03:00' or '+03'
+}
+
+message DateTime
+{
+    optional Date date = 1;
+    optional Time time = 2;
+}
+
+message DateTest
+{
+    repeated Date date = 1;
+}
