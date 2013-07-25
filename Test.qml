@@ -11,11 +11,11 @@ ApplicationWindow {
 
     TableView {
         anchors.fill: parent
-        
+
         model: ProtobufModel {
             metadata: "qrc:/pb/test.proto"
             message: "DateTest"
-            source: "/tmp/test_data.pb"
+            source: "file:/tmp/test_data.pb"
         }
     }
 }

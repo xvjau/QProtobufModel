@@ -96,6 +96,11 @@ int main(int argc, char** argv)
             return app.exec();
         }
     }
+    catch(const QString &e)
+    {
+        std::cerr << "QString error: " << e.toStdString() << std::endl;
+        return 1;
+    }
     catch(const std::exception &e)
     {
         std::cerr << "Unknown error: " << e.what() << std::endl;

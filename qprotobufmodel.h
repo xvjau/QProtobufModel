@@ -23,6 +23,11 @@
 
 #include <QAbstractItemModel>
 #include <QUrl>
+#include <QSharedPointer>
+
+#include <google/protobuf/message.h>
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/compiler/importer.h>
 
 class QProtobufModel : public QAbstractItemModel
 {
@@ -88,6 +93,12 @@ private:
     QUrl m_metadata;
     QString m_message;
     QUrl m_source;
+
+    ::google::protobuf::DynamicMessageFactory   m_messageFactory;
+    QSharedPointer<const ::google::protobuf::Message> m_prototype;
+    QSharedPointer<::google::protobuf::Message> m_rootItem;
+
+    void checkSourceChange();
 };
 
 #endif // QPROTOBUFMODEL_H
