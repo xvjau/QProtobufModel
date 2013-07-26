@@ -55,25 +55,25 @@ public:
     QProtobufModel(QObject *_parent = nullptr);
     virtual ~QProtobufModel();
 
-    virtual QModelIndex index(int row, int column,
-                              const QModelIndex &parent = QModelIndex()) const override;
-    virtual QModelIndex parent(const QModelIndex &child) const override;
+    virtual QModelIndex index(int _row, int _column,
+                              const QModelIndex &_parent = QModelIndex()) const override;
+    virtual QModelIndex parent(const QModelIndex &_child) const override;
 
-    virtual int rowCount(const QModelIndex& = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex& = QModelIndex()) const override;
+    virtual int rowCount(const QModelIndex &_index = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex &_index = QModelIndex()) const override;
 
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    virtual Qt::ItemFlags flags(const QModelIndex &_index) const override;
+    virtual QVariant data(const QModelIndex &_index, int _role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex &_index, const QVariant &_value, int _role = Qt::EditRole) override;
 
-    virtual QVariant headerData(int section, Qt::Orientation orientation,
-                                int role = Qt::DisplayRole) const override;
+    virtual QVariant headerData(int _section, Qt::Orientation _orientation,
+                                int _role = Qt::DisplayRole) const override;
 
-    virtual bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-    virtual bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    virtual bool insertRows(int _row, int _count, const QModelIndex &_parent = QModelIndex()) override;
+    virtual bool removeRows(int _row, int _count, const QModelIndex &_parent = QModelIndex()) override;
 
-    virtual bool canFetchMore(const QModelIndex &) const override;
-    virtual void fetchMore(const QModelIndex &parent) override;
+    virtual bool canFetchMore(const QModelIndex &_index) const override;
+    virtual void fetchMore(const QModelIndex &_parent) override;
 
     const QUrl& metadata() const { return m_metadata; }
     void setMetadata(const QUrl& _url);
@@ -90,15 +90,19 @@ signals:
     void sourceChanged(const QUrl& _url);
 
 private:
+    typedef ::google::protobuf::Message PBMessage;
+
     QUrl m_metadata;
     QString m_message;
     QUrl m_source;
 
     ::google::protobuf::DynamicMessageFactory   m_messageFactory;
-    QSharedPointer<const ::google::protobuf::Message> m_prototype;
-    QSharedPointer<::google::protobuf::Message> m_rootItem;
+    const PBMessage* m_prototype;
+    PBMessage* m_rootItem;
 
     void checkSourceChange();
+
+    PBMessage* getMessage(const QModelIndex &_index) const;
 };
 
 #endif // QPROTOBUFMODEL_H

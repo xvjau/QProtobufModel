@@ -28,6 +28,8 @@
 
 #include <memory>
 
+#include <cassert>
+
 namespace pb = ::google::protobuf;
 
 QProtobufModel::QProtobufModel(QObject *_parent):
@@ -41,62 +43,104 @@ QProtobufModel::~QProtobufModel()
 
 }
 
-QModelIndex QProtobufModel::index(int row, int column, const QModelIndex &parent) const
+QProtobufModel::PBMessage *QProtobufModel::getMessage(const QModelIndex &_index) const
+{
+    if (_index.isValid())
+    {
+        PBMessage* result = static_cast<PBMessage*>(_index.internalPointer());
+        if (result)
+            return result;
+    }
+
+    return m_rootItem;
+}
+
+QModelIndex QProtobufModel::index(int _row, int _column, const QModelIndex &_parent) const
 {
     return createIndex(0, 0);
 }
 
-QModelIndex QProtobufModel::parent(const QModelIndex &child) const
+QModelIndex QProtobufModel::parent(const QModelIndex &_child) const
 {
     return createIndex(0, 0);
 }
 
-int QProtobufModel::rowCount(const QModelIndex &) const
+int QProtobufModel::rowCount(const QModelIndex &_index) const
 {
-    return 0;
+    PBMessage* msg = getMessage(_index);
+
+    if (msg == m_rootItem)
+        return 1;
+
+    PBMessage* parent = getMessage(_index.parent());
+
+    auto descr = parent->GetDescriptor();
+
+    auto field = descr->FindFieldByName(msg->GetTypeName());
+
+    if (field->is_repeated())
+    {
+        int count = parent->GetReflection()->FieldSize(*parent, field);
+        return count;
+    }
+    else
+        return 1;
 }
 
-int QProtobufModel::columnCount(const QModelIndex &) const
+int QProtobufModel::columnCount(const QModelIndex &_index) const
 {
-    return 0;
+    PBMessage* msg = getMessage(_index);
+    return msg->GetDescriptor()->field_count();
 }
 
-Qt::ItemFlags QProtobufModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QProtobufModel::flags(const QModelIndex &_index) const
 {
-    return QAbstractItemModel::flags(index);
+    return QAbstractItemModel::flags(_index);
 }
 
-QVariant QProtobufModel::data(const QModelIndex &index, int role) const
+QVariant QProtobufModel::data(const QModelIndex &_index, int _role) const
+{
+    switch(_role)
+    {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+        {
+            PBMessage* msg = getMessage(_index);
+
+
+        }
+    }
+
+
+    return QVariant();
+}
+
+bool QProtobufModel::setData(const QModelIndex &_index, const QVariant &_value, int _role)
+{
+    return QAbstractItemModel::setData(_index, _value, _role);
+}
+
+QVariant QProtobufModel::headerData(int _section, Qt::Orientation _orientation, int _role) const
 {
     return QVariant();
 }
 
-bool QProtobufModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool QProtobufModel::insertRows(int _row, int _count, const QModelIndex &_parent)
 {
-    return QAbstractItemModel::setData(index, value, role);
+    return QAbstractItemModel::insertRows(_row, _count, _parent);
 }
 
-QVariant QProtobufModel::headerData(int section, Qt::Orientation orientation, int role) const
+bool QProtobufModel::removeRows(int _row, int _count, const QModelIndex &_parent)
 {
-    return QAbstractItemModel::headerData(section, orientation, role);
+    return QAbstractItemModel::removeRows(_row, _count, _parent);
 }
 
-bool QProtobufModel::insertRows(int row, int count, const QModelIndex &parent)
-{
-    return QAbstractItemModel::insertRows(row, count, parent);
-}
-
-bool QProtobufModel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    return QAbstractItemModel::removeRows(row, count, parent);
-}
-
-bool QProtobufModel::canFetchMore(const QModelIndex &) const
+bool QProtobufModel::canFetchMore(const QModelIndex &_index) const
 {
     return false;
 }
 
-void QProtobufModel::fetchMore(const QModelIndex &parent)
+void QProtobufModel::fetchMore(const QModelIndex &_parent)
 {
 }
 
@@ -263,9 +307,9 @@ void QProtobufModel::checkSourceChange()
 
     auto descriptor = fileDescriptor->FindMessageTypeByName(m_message.toStdString());
 
-    m_prototype = QSharedPointer<const ::pb::Message>(m_messageFactory.GetPrototype(descriptor));
+    m_prototype = m_messageFactory.GetPrototype(descriptor);
 
-    m_rootItem = QSharedPointer<::pb::Message>(m_prototype->New());
+    m_rootItem = m_prototype->New();
 
     LocalFileStream sourceStream(m_source);
 
