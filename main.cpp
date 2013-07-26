@@ -1,13 +1,15 @@
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQuickWindow>
 #include <QQmlEngine>
 #include <QQmlComponent>
+#include <boost/concept_check.hpp>
 
 #include <test.pb.h>
 #include <fstream>
 
 #include "qprotobufmodel.h"
+#include "treewindow.h"
 
 #include <iostream>
 
@@ -19,7 +21,7 @@ std::ostream& operator<<(std::ostream& str, const QString& _string)
 
 int main(int argc, char** argv)
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     ::pb::DateTest dateTest;
 
@@ -65,6 +67,18 @@ int main(int argc, char** argv)
 
     try
     {
+        TreeWindow treeWinndow;
+
+        QProtobufModel *model = new QProtobufModel(&treeWinndow);
+
+        model->setSource(QUrl("/tmp/test_data.pb"));
+        model->setMetadata(QUrl("qrc:/pb/test.proto"));
+        model->setMessage("DateTest");
+        treeWinndow.setModel(model);
+
+        treeWinndow.show();
+
+        /*
         QUrl mainWindowUrl("qrc:/qml/Test.qml");
 
         QQmlEngine engine;
@@ -93,8 +107,9 @@ int main(int argc, char** argv)
 
             window->show();
 
-            return app.exec();
         }
+        */
+        return app.exec();
     }
     catch(const QString &e)
     {
